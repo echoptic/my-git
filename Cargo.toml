@@ -1,0 +1,10 @@
+[package]
+name = "my-git"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+ignore = "0.4"
+flate2 = "1.0"
+sha1 = "0.6"
+clap = "2.31.0"
