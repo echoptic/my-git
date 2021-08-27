@@ -5,16 +5,16 @@ mod init;
 
 use blob::Blob;
 use clap::{App, AppSettings, Arg, SubCommand};
+use deflate::decompress;
 
 fn main() {
-    let blob = Blob::from_path("empty").unwrap();
-    println!("{}", blob.hash);
-    println!("{:?}", blob.data);
+    let c = decompress(".got/objects/27/7d8f184d41d74580d0a511b2941ce7327c814d").unwrap();
+    println!("{}", c);
     let matches = App::new("git")
         .setting(AppSettings::ArgRequiredElseHelp)
         .subcommand(
             SubCommand::with_name("init")
-                .about("Create an empty Git repository or reinitialize an existing one")
+                .about("Create an empty repository")
                 .arg(
                     Arg::with_name("name")
                         .index(1)

@@ -12,13 +12,25 @@ pub struct Blob {
 }
 
 impl Blob {
-    pub fn from_path(path: &str) -> io::Result<Self> {
+    pub fn from_path(path: PathBuf) -> io::Result<Self> {
         let mut file = File::open(path)?;
         let mut data = Vec::new();
         file.read_to_end(&mut data)?;
 
-        let hash = Sha1::from(&data).digest().to_string();
+        // This is the blob (file len)\0 at start of every git file
+        let mut blob_info = Vec::new();
+        format!("blob {}\0", data.len())
+            .as_bytes()
+            .iter()
+            .for_each(|&byte| blob_info.push(byte));
 
-        Ok(Self { hash, data })
+        blob_info.append(&mut data);
+
+        let hash = Sha1::from(&blob_info).digest().to_string();
+
+        Ok(Self {
+            hash,
+            data: blob_info,
+        })
     }
 }
