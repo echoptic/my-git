@@ -30,5 +30,5 @@ pub fn init(subdir: &Option<&str>) -> io::Result<PathBuf> {
     let mut head = File::create(path.join("HEAD"))?;
     head.write_all("ref: refs/heads/master".as_bytes())?;
 
-    Ok(path.clone().to_path_buf())
+    Ok(path.to_path_buf())
 }

@@ -1,26 +1,19 @@
-mod add;
 mod blob;
+mod commands;
 mod deflate;
-mod init;
+mod index;
 
-use blob::Blob;
+use commands::*;
+
 use clap::{App, AppSettings, Arg, SubCommand};
-use deflate::decompress;
 
 fn main() {
-    let c = decompress(".got/objects/27/7d8f184d41d74580d0a511b2941ce7327c814d").unwrap();
-    println!("{}", c);
     let matches = App::new("git")
         .setting(AppSettings::ArgRequiredElseHelp)
         .subcommand(
             SubCommand::with_name("init")
                 .about("Create an empty repository")
-                .arg(
-                    Arg::with_name("name")
-                        .index(1)
-                        .multiple(false)
-                        .required(false),
-                ),
+                .arg(Arg::with_name("name").index(1)),
         )
         .subcommand(
             SubCommand::with_name("add")
@@ -32,6 +25,8 @@ fn main() {
                         .required(true),
                 ),
         )
+        .subcommand(SubCommand::with_name("checkout").arg(Arg::with_name("path").index(1)))
+        .subcommand(SubCommand::with_name("reset").arg(Arg::with_name("hard").long("hard")))
         .get_matches();
 
     match matches.subcommand() {
@@ -42,7 +37,15 @@ fn main() {
             };
         }
         ("add", Some(args)) => {
-            add::add(&args.values_of("files").unwrap().collect());
+            add::add(&args.values_of("files").unwrap().collect()).unwrap();
+        }
+        ("checkout", Some(args)) => checkout::checkout(&args.value_of("path")),
+        ("reset", Some(args)) => {
+            if args.is_present("hard") {
+                reset::hard()
+            } else {
+                reset::reset()
+            }
         }
         _ => {}
     }

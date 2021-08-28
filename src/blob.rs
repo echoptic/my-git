@@ -1,10 +1,9 @@
+use sha1::Sha1;
 use std::{
     fs::File,
     io::{self, Read},
     path::PathBuf,
 };
-
-use sha1::Sha1;
 
 pub struct Blob {
     pub hash: String,
@@ -18,19 +17,19 @@ impl Blob {
         file.read_to_end(&mut data)?;
 
         // This is the blob (file len)\0 at start of every git file
-        let mut blob_info = Vec::new();
+        let mut blob_data = Vec::new();
         format!("blob {}\0", data.len())
             .as_bytes()
             .iter()
-            .for_each(|&byte| blob_info.push(byte));
+            .for_each(|&byte| blob_data.push(byte));
 
-        blob_info.append(&mut data);
+        blob_data.append(&mut data);
 
-        let hash = Sha1::from(&blob_info).digest().to_string();
+        let hash = Sha1::from(&blob_data).hexdigest();
 
         Ok(Self {
             hash,
-            data: blob_info,
+            data: blob_data,
         })
     }
 }
